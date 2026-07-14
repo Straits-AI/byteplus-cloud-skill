@@ -211,8 +211,15 @@ def inspect_tools(timeout: float = 10) -> dict[str, Any]:
 
 
 def config_permissions(path: Path) -> dict[str, Any]:
+    if os.name == "nt":
+        return {
+            "supported": False,
+            "owner_only": None,
+            "note": "POSIX owner-only mode checks are unavailable on Windows",
+        }
     mode = stat.S_IMODE(path.stat().st_mode)
     return {
+        "supported": True,
         "octal": f"{mode:04o}",
         "owner_only": mode & 0o077 == 0,
     }
@@ -474,7 +481,7 @@ def print_summary(report: dict[str, Any]) -> None:
             f"Profiles: {config.get('profile_count', 0)}; current={config.get('current') or '<none>'}"
         )
         permissions = config.get("permissions", {})
-        if permissions and not permissions.get("owner_only"):
+        if permissions.get("supported", True) and not permissions.get("owner_only"):
             print(
                 f"Warning: config permissions are {permissions.get('octal')}, not owner-only"
             )

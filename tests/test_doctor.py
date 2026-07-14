@@ -109,7 +109,12 @@ class DoctorTests(unittest.TestCase):
             self.assertNotIn("secret-token", serialized)
             self.assertNotIn("secret-refresh", serialized)
             self.assertEqual(result["profile_count"], 2)
-            self.assertTrue(result["permissions"]["owner_only"])
+            if os.name == "nt":
+                self.assertIsNone(result["permissions"]["owner_only"])
+                self.assertFalse(result["permissions"]["supported"])
+            else:
+                self.assertTrue(result["permissions"]["owner_only"])
+                self.assertTrue(result["permissions"]["supported"])
             self.assertEqual(result["profiles"][0]["name"], "<profile-1>")
             self.assertEqual(result["profiles"][1]["name"], "<profile-2>")
             self.assertEqual(result["current"], "<configured>")
@@ -127,7 +132,10 @@ class DoctorTests(unittest.TestCase):
             path.write_text('{"profiles": {}}', encoding="utf-8")
             path.chmod(0o644)
             result = doctor.inspect_profiles(path)
-            self.assertFalse(result["permissions"]["owner_only"])
+            if os.name == "nt":
+                self.assertIsNone(result["permissions"]["owner_only"])
+            else:
+                self.assertFalse(result["permissions"]["owner_only"])
 
     def test_reports_empty_config_as_unconfigured(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -224,14 +232,16 @@ class DoctorTests(unittest.TestCase):
             "AWS_SECRET_ACCESS_KEY": "secret-aws",
             "LANG": "C.UTF-8",
         }
+        executable = Path("opt") / "byteplus" / "bin" / "bp"
+        home = Path("isolated-home")
         with mock.patch.dict(os.environ, ambient, clear=True):
-            env = doctor.subprocess_env("/opt/byteplus/bin/bp", Path("/isolated-home"))
+            env = doctor.subprocess_env(str(executable), home)
         serialized = json.dumps(env)
         self.assertNotIn("secret-ak", serialized)
         self.assertNotIn("secret-ark", serialized)
         self.assertNotIn("secret-aws", serialized)
-        self.assertEqual(env["HOME"], "/isolated-home")
-        self.assertTrue(env["PATH"].startswith("/opt/byteplus/bin"))
+        self.assertEqual(env["HOME"], str(home))
+        self.assertEqual(env["PATH"].split(os.pathsep)[0], str(executable.parent))
 
     def test_temporary_executable_is_rejected_without_execution(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

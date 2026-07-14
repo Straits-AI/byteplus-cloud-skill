@@ -45,17 +45,19 @@ class InstallBpTests(unittest.TestCase):
                 },
             ],
         }
+        destination = Path(tempfile.gettempdir()) / "byteplus-test-bin"
         plan = install_bp.build_plan(
-            release, Path("/tmp/bin"), system="linux", architecture="amd64"
+            release, destination, system="linux", architecture="amd64"
         )
         self.assertEqual(plan.version, "1.2.3")
         self.assertEqual(plan.archive_name, "byteplus-cli_1.2.3_linux_amd64.tar.gz")
-        self.assertTrue(plan.destination.endswith("/tmp/bin/bp"))
+        self.assertEqual(Path(plan.destination).name, "bp")
+        self.assertEqual(Path(plan.destination).parent.name, "byteplus-test-bin")
 
         release["assets"][0]["browser_download_url"] = "https://example.com/bp.tar.gz"
         with self.assertRaises(install_bp.InstallerError):
             install_bp.build_plan(
-                release, Path("/tmp/bin"), system="linux", architecture="amd64"
+                release, destination, system="linux", architecture="amd64"
             )
 
         release["assets"][0]["browser_download_url"] = (
@@ -64,7 +66,7 @@ class InstallBpTests(unittest.TestCase):
         )
         with self.assertRaises(install_bp.InstallerError):
             install_bp.build_plan(
-                release, Path("/tmp/bin"), system="linux", architecture="amd64"
+                release, destination, system="linux", architecture="amd64"
             )
 
     def test_parses_exact_checksum_entry(self) -> None:

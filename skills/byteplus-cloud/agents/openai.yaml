@@ -1,0 +1,4 @@
+interface:
+  display_name: "BytePlus Cloud"
+  short_description: "Deploy and operate BytePlus with coding agents"
+  default_prompt: "Use $byteplus-cloud to plan and deploy this application on BytePlus safely."

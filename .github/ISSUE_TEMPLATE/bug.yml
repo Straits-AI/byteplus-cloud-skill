@@ -1,0 +1,48 @@
+name: Bug report
+description: Report a reproducible problem in the skill or a bundled helper.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never include credentials, profile files, signed URLs, account IDs, exact
+        live resource IDs, customer data, or raw secret-bearing responses.
+  - type: input
+    id: version
+    attributes:
+      label: Revision or release
+      placeholder: v0.1.0 or commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Coding agent
+      options:
+        - Codex
+        - Claude Code
+        - Cursor
+        - GitHub Copilot
+        - Other Agent Skills client
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the expected and actual behavior using sanitized data.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use fake credentials and non-sensitive fixtures only.
+    validations:
+      required: true
+  - type: textarea
+    id: checks
+    attributes:
+      label: Checks performed
+      description: Include relevant offline tests and current official sources.

@@ -1,0 +1,19 @@
+changelog:
+  categories:
+    - title: Capabilities
+      labels:
+        - enhancement
+        - capability-gap
+    - title: Fixes
+      labels:
+        - bug
+    - title: Dependencies and maintenance
+      labels:
+        - dependencies
+        - automation
+    - title: Other changes
+      labels:
+        - "*"
+  exclude:
+    labels:
+      - skip-changelog

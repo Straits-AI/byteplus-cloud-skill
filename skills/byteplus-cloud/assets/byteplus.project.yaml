@@ -1,0 +1,25 @@
+version: 1
+
+application:
+  name: REPLACE_ME
+  environment: development
+
+target:
+  profile: dev
+  region: ap-southeast-1
+
+infrastructure:
+  engine: none
+  directory: null
+  workspace: null
+
+resources: {}
+
+outputs: {}
+
+verification:
+  health_path: /health
+  last_verified_at: null
+
+# This file is an agent-readable application map, not cloud state.
+# Never store credentials, tokens, passwords, API keys, kubeconfigs, or signed URLs here.

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Straits-AI/byteplus-cloud-skill/security/advisories/new
+    about: Report credential leakage, injection, or unsafe mutation privately.
+  - name: BytePlus documentation
+    url: https://docs.byteplus.com/
+    about: Check current official product documentation and account requirements.

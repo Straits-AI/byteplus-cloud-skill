@@ -1,0 +1,39 @@
+name: Capability gap
+description: Track a missing, outdated, blocked, or partially validated BytePlus workflow.
+title: "[Capability]: "
+labels: [capability-gap]
+body:
+  - type: input
+    id: service
+    attributes:
+      label: BytePlus service or workflow
+    validations:
+      required: true
+  - type: dropdown
+    id: current-level
+    attributes:
+      label: Current evidence level
+      options:
+        - Not covered
+        - Guidance only
+        - Live partial
+        - Live E2E but outdated
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Desired developer outcome
+      description: Explain the end-to-end workflow the coding agent should complete.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Current official sources
+      description: Link documentation, API schemas, SDKs, providers, or CLI help.
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Safety, cost, and entitlement boundaries
+      description: Do not include account-specific data or credentials.

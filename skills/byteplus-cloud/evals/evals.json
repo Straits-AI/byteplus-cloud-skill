@@ -148,6 +148,20 @@
         "The smoke test retrieves the current HTTP or WebSocket schema and Voice List, synthesizes one short benign phrase with one stock voice, stores audio in a protected temporary file, and verifies request status, magic/content type, decode, non-zero duration, media properties, and digest.",
         "Cleanup removes disposable audio and only deletes a run-owned Seed Speech application or credential when exact destructive approval exists; deployed integration keeps App ID/resource ID configurable and defines credential rotation ownership."
       ]
+    },
+    {
+      "id": 22,
+      "prompt": "Diagnosis and planning only: `bp kafka CreateInstance` returns an opaque InternalError 500 even though the request resembles the official example. The request used `--ChargeInfo.ChargeType`, omitted pagination from DescribeInstances, guessed `Zones`, and contains a password. KMS also returns KMS_ServiceNotOpen. Produce a safe recovery and eventual cleanup runbook without creating IAM, activating products, printing secrets, or mutating cloud state.",
+      "expected_output": "A prerequisite-first Kafka/KMS workflow that diagnoses without parameter roulette, distinguishes activation from service-linked-role consent, uses protected structured requests, and tears dependencies down in the correct order.",
+      "files": [],
+      "expectations": [
+        "The response treats InternalError as non-diagnostic, checks current Kafka cross-service authorization and reads ServiceRoleForKafka, but does not guess role names, grant IAMFullAccess, or create the role without exact IAM approval.",
+        "It checks the current CLI for a documented CreateServiceLinkedRole path before requiring console consent, while treating KMS_ServiceNotOpen as a product activation signal and identifying only the minimal owner-controlled activation step if no API exists.",
+        "It retrieves enums and constraints from product discovery actions, the official request example, API Explorer, and current SDK/provider types; it accounts for JavaScript documentation returning only an app shell and never invents a value.",
+        "It supplies required PageNumber/PageSize, calls DescribeAvailabilityZones with RegionId, preserves CreateInstance ZoneId, and uses one JSON body rather than dotted nested flags.",
+        "It keeps the Kafka password out of CLI arguments and output by using a credential-isolating SDK path when no protected bp input exists, and it stops rather than testing successive secret character variants.",
+        "The cleanup plan inventories children, deletes approved topics/groups and blockers, closes the public address, deletes the pay-as-you-go instance, then releases only the detached run-owned EIP with bounded polling and fresh absence checks."
+      ]
     }
   ]
 }

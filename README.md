@@ -23,7 +23,7 @@ retrieval-first operating layer over current BytePlus tools:
 - infrastructure routing between `bp`, BytePlus Cloud Control Terraform,
   product SDKs, `nest`, and product-specific MCPs;
 - procedures for ECS/VPC, veFaaS, Cloud Sandbox, ModelArk, Seed Speech, Edge
-  Functions, TOS, VKE, databases, observability, and AgentKit;
+  Functions, TOS, VKE, databases, Kafka/KMS readiness, observability, and AgentKit;
 - explicit cost, IAM, networking, secret, approval, verification, rollback, and
   cleanup boundaries; and
 - small standard-library helpers for CLI diagnosis, catalog extraction, safe CLI
@@ -35,7 +35,7 @@ prove the result without leaking credentials.
 
 ## Validation status
 
-Validation performed on 13–14 July 2026 used `bp` 1.0.17 in
+Validation performed on 13–16 July 2026 used `bp` 1.0.17 in
 `ap-southeast-1`. Raw account-specific ledgers are intentionally not published.
 
 | Capability | Public-preview status |
@@ -46,7 +46,8 @@ Validation performed on 13–14 July 2026 used `bp` 1.0.17 in
 | veFaaS Cloud Sandbox, private WebShell execution, and cleanup | Live end-to-end validated |
 | ModelArk Seed text, Seedream image, and Seedance 1.5 video | Live bounded calls validated and cleaned up |
 | Seed Speech TTS 2.0 | Live bounded call validated and restored inactive |
-| AgentKit runtime and All-in-one sandbox creation | Read/auth validated; create path blocked by account entitlement |
+| AgentKit All-in-one (`CodeEnv`) sandbox | Live create, 60-second session invocation, exact cleanup, and fresh zero inventories validated |
+| Custom AgentKit runtime deployment | Local A2A flow and official CR build/push validated; managed create reached `Error` at version 0 with no endpoint/key, then exact runtime/registry cleanup was verified |
 | Public HTTP/APIG deployment | Not yet end-to-end validated |
 | Seedance 2.0 | Not tested; its prepaid path was outside the test boundary |
 | Edge Functions, TOS, VKE, managed databases, Terraform, and broad observability | Retrieval and runbook coverage; not part of the live acceptance suite |

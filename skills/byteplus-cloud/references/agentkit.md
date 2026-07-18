@@ -26,11 +26,12 @@ public API has no activation action, state the one UI step and stop; never accep
 terms, activate paid use, or create IAM silently.
 
 Activation is not self-service for every account. A July 2026 developer account
-was redirected from the AgentKit console to a `Talk to an expert` beta-product
-page with no activation control. Treat that as an entitlement blocker. Do not
+was initially redirected from the AgentKit console to a `Talk to an expert`
+beta-product page with no activation control. Treat that state as an entitlement
+blocker. After BytePlus enabled the same account, the documented create path
+worked without changing the account identity, region, or OAuth login. Do not
 submit a sales/contact request, message an external party, or create IAM, CR, TOS,
-or ModelArk dependencies without the user's separate authorization; those actions
-cannot bypass the missing entitlement.
+or ModelArk dependencies to bypass a missing entitlement.
 
 ## Discover the live contract
 
@@ -57,6 +58,12 @@ Registry artifacts, and related ModelArk resources. Open a sanitized run ledger
 with the exact profile/account/region/project, deterministic run prefix, created
 IDs, request IDs, dependency ownership, cost/lifetime, and cleanup actions.
 
+Also run `agentkit config --show` inside the project. AgentKit CLI 0.7.13 generated
+a project whose persisted cloud provider was `volcengine` even when the process
+environment selected BytePlus. Require the displayed project provider and region
+to be BytePlus values before build or deploy; do not rely on environment variables
+alone.
+
 ## Reuse `bp login` without exposing credentials
 
 Do not assume the AgentKit CLI natively reads a `bp login` profile. The tested
@@ -67,7 +74,9 @@ profile.
 A live July 2026 test proved that `clicreds.CliProvider` could use a console-login
 OAuth profile to sign AgentKit OpenAPI requests. It also proved that an isolated
 parent process could resolve temporary credentials in memory and provide them
-only to an AgentKit CLI child process. No AK/SK was printed or persisted.
+only to an AgentKit CLI child process. With AgentKit CLI 0.7.13, the child also
+required `AGENTKIT_CLOUD_PROVIDER=byteplus` and the explicit BytePlus region;
+otherwise the CLI defaulted to Volcano Engine. No AK/SK was printed or persisted.
 
 Apply this boundary when OAuth reuse is required:
 
@@ -107,15 +116,74 @@ documented API version succeed:
 5. Preserve sanitized request IDs and run fresh list calls to prove that the failed
    probes created no resource.
 
-The July 2026 developer-account test reached exactly this state: OAuth-signed
-`ListRuntimes` and `ListTools` succeeded, while documented create actions returned
-`InvalidActionOrVersion`; final inventories remained zero. This is evidence for
-the prerequisite runbook, not a successful AgentKit deployment claim.
+The initial July 2026 developer-account test reached exactly this state:
+OAuth-signed `ListRuntimes` and `ListTools` succeeded, while documented create
+actions returned `InvalidActionOrVersion`; final inventories remained zero. After
+BytePlus enabled AgentKit on the account, a repeat test created and invoked a
+minimal sandbox successfully. This confirms that the earlier result was an
+entitlement boundary rather than an invalid OAuth or endpoint implementation.
 
 ## Deploy an agent runtime
 
 Only continue after service activation and the exact IAM/networking/cost plan are
 approved.
+
+### Validate the generated application locally
+
+Treat `agentkit init` as scaffolding, not proof that its unconstrained dependency
+set currently resolves to a runnable application. In a live 16 July 2026 check,
+AgentKit CLI/SDK 0.7.13 generated an A2A template whose `agentkit-sdk-python>=`
+constraint resolved with `a2a-sdk` 1.1.0, while the installed AgentKit SDK still
+imported the A2A 0.3 server modules. Pinning only A2A then exposed a second missing
+runtime dependency because the template left `google-adk` commented out.
+
+For that tested SDK baseline, this compatible local set passed the package
+resolver, health route, agent-card route, and one A2A `message/send` call:
+
+```text
+agentkit-sdk-python==0.7.13
+a2a-sdk==0.3.7
+google-adk==1.32.0
+opentelemetry-api==1.37.0
+opentelemetry-sdk==1.37.0
+```
+
+These are evidence pins, not permanent recommendations. Before using them, inspect
+the current package metadata and generated requirements, resolve in an isolated
+environment, and run the package manager's consistency check. If newer official
+versions have corrected the dependency graph, prefer the current compatible set
+and record it in the run ledger.
+
+Before any cloud build or registry creation, require all of the following locally:
+
+1. the process starts on an unused explicit port;
+2. `GET /ping` returns an exact non-secret marker;
+3. `GET /.well-known/agent-card.json` returns the intended card and protocol;
+4. a real A2A `message/send` request returns the exact marker; and
+5. the process exits cleanly and leaves no listener behind.
+
+Use a deterministic no-model executor for platform acceptance where possible. It
+isolates runtime packaging and protocol behavior from ModelArk activation, model
+availability, API-key handling, latency, and inference charges. A separate
+model-backed acceptance is still required before claiming model integration.
+
+The first `agentkit build` may appear quiet while Docker downloads the official
+AgentKit base image. Confirm the generated `FROM` registry is the current official
+BytePlus regional registry, then use bounded Docker pull/build diagnostics rather
+than assuming a deadlock or substituting an unreviewed base image. Record the
+resolved image digest used for a managed deployment. Check host and Docker storage
+capacity before the pull: the tested Python 3.12 base expanded to approximately
+2.27 GB before application and build-cache layers. Remove only images, containers,
+and caches owned by the current run; never use a broad prune on a shared developer
+machine.
+
+Do not equate Container Registry `public endpoint: Enabled` with immediate Docker
+readiness. The tested registry control plane reported enabled before the exact
+domain resolved and bypassed the local Docker proxy path. Poll the registry
+`/v2/` endpoint from the same network namespace used by Docker until it returns
+the expected unauthenticated response, then log in and push. If a narrowly scoped
+temporary DNS or proxy exception is required, record its original state, limit it
+to the exact registry domain, and revert it after the run.
 
 1. Inspect the application, framework/protocol, entry point, dependency file,
    health behavior, model/tool access, secrets, outbound network, and observability
@@ -138,6 +206,20 @@ approved.
    expected application marker or response without logging model content or
    secrets.
 
+An interrupted or timed-out `agentkit deploy` can create the remote runtime before
+the CLI persists its ID locally. Before retrying, list runtimes by the deterministic
+run name and reconcile the existing ID; a blind retry can fail with a duplicate
+name while leaving the original resource behind. Treat raw runtime objects as
+secret-bearing because a successful key-auth runtime may include its API key and
+endpoint. Emit only a sanitized state summary.
+
+If a runtime reaches `Error` at version 0 with no endpoint or API key, preserve its
+safe status and artifact metadata, delete that exact runtime, and verify absence.
+Do not repeatedly recreate it without a new diagnosis. Also inspect generated
+defaults before creation: the tested CLI requested a minimum replica of 1 and
+enabled APM-related runtime settings even though the application did not request
+observability. These defaults can affect cost and dependencies.
+
 Do not treat runtime creation as deployment success. Verify control plane, data
 plane, and operations independently.
 
@@ -147,24 +229,49 @@ AgentKit managed tools and veFaaS Cloud Sandbox are distinct products. For an
 AgentKit All-in-one or Skills Sandbox workflow:
 
 An All-in-one (AIO) Sandbox is the smallest documented AgentKit proof after
-entitlement. It does not require a customer Container Registry image, ModelArk
-endpoint, TOS mount, or runtime service role. Public egress remains an explicit
-network boundary. The lowest cross-document-safe proof is one run-tagged AIO tool
-at 2,000 millicores and 4,096 MiB, no TOS, no private network, a generated API key
-kept out of output, one 60-second session, and one benign `RunCode` marker.
+entitlement. The public API documentation describes this class as All-in-one,
+while AgentKit CLI 0.7.13 accepts `CodeEnv`; retrieve the current installed schema
+and use its exact value. It does not require a customer Container Registry image,
+ModelArk endpoint, TOS mount, or runtime service role. The lowest tested proof is
+one run-tagged tool at 2,000 millicores and 4,096 MiB, no TOS, no private network,
+a generated API key kept out of output, one 60-second session, and one benign
+shell marker.
 
 1. Retrieve the current `CreateTool`, `CreateSession`, invocation, and delete
    schemas and supported tool types.
 2. Confirm required service roles and policies. Current Skills Sandbox guidance
    may require TOS access; do not grant it to an unrelated tool.
-3. Select the smallest current CPU/memory, shortest session TTL, no storage/VPC,
-   and no public ingress unless explicitly required.
+3. Select the smallest current CPU/memory, shortest session TTL, and no
+   storage/VPC. AgentKit CLI 0.7.13 rejects both public and private network access
+   being disabled; a no-VPC `CodeEnv` therefore uses an authenticated public
+   endpoint. Disclose this boundary before creation.
 4. Create the tool, record its ID, poll ready, create one short session, and run a
    benign marker workload.
 5. Verify tool configuration, session result, logs/status, and a bounded failure
    case.
 6. Delete the session, tool, and run-owned IAM/storage dependencies, then require
    fresh zero-result inventories.
+
+Do not emit raw tool or session objects. In the tested 0.7.13 CLI,
+`agentkit tools show --output json` returned the generated API key in plaintext,
+and `agentkit tools session list --fields ...` still emitted credential-bearing
+session endpoints. Capture those results inside a credential-isolating process,
+redact complete API keys and signed endpoint query strings, and output only safe
+IDs, status, shape, timestamps, and request IDs. Deleting the tool invalidates its
+generated key.
+
+The live 16 July 2026 acceptance created one `CodeEnv` tool, reached `Ready`,
+created a 60-second session, observed the exact marker
+`bpskill-agentkit-ok`, deleted the probe session and tool, and then obtained fresh
+`ListTools=0` and `ListRuntimes=0`. This is live AIO Sandbox evidence; it is not yet
+evidence for a custom AgentKit runtime deployment.
+
+The same acceptance also built and pushed a deterministic A2A image through the
+official CLI to a run-owned BytePlus Container Registry. Two managed runtime
+creates were accepted but ended at `Error`, version 0, without an endpoint or API
+key. Both runtimes and the repository, namespace, and registry were deleted, and
+fresh inventories were zero. Keep this classified as live partial until a managed
+runtime reaches ready and returns the exact marker through its real endpoint.
 
 If create actions are unavailable because AgentKit is not activated, do not claim
 that the independent veFaaS sandbox test proves AgentKit AIO/Skills Sandbox.

@@ -60,6 +60,12 @@ When sources disagree, stop before mutation and resolve the discrepancy. A CLI a
 - RDS for MySQL documentation: <https://docs.byteplus.com/en/docs/RDS_for_MySQL/about_rds_for_mysql>
 - RDS for PostgreSQL documentation: <https://docs.byteplus.com/en/docs/RDS_for_PG/>
 - RDS for SQL Server documentation: <https://docs.byteplus.com/en/docs/RDS_for_SQLServer/>
+- Kafka cross-service authorization: <https://docs.byteplus.com/api/docs/kafka/cross-service-authorization>
+- Kafka API overview: <https://docs.byteplus.com/en/docs/kafka/API-overview-2>
+- Kafka CreateInstance V2: <https://docs.byteplus.com/en/docs/kafka/CreateInstance-v2>
+- Kafka DescribeInstances V2: <https://docs.byteplus.com/api/docs/kafka/DescribeInstances-v2>
+- Kafka DeleteInstance V2: <https://docs.byteplus.com/en/docs/kafka/DeleteInstance-v2>
+- KMS getting started and activation: <https://docs.byteplus.com/en/docs/kms/Getting_started_with_key_management>
 
 ## Freshness checklist
 
@@ -78,3 +84,8 @@ Before using an exact command or schema:
 - Cloud Control covers only supported resource types. Its repository explicitly directs users to request missing resources.
 - BytePlus and Volcano Engine use related technology but different international/domestic control planes. Never reuse Volcano Engine endpoints, credentials, regions, Terraform resources, or MCP servers without explicit BytePlus compatibility documentation.
 - BytePlus does not currently publish a general documentation MCP comparable to Cloudflare Docs MCP. Use official web retrieval plus live tool/provider schemas.
+- Some BytePlus documentation URLs are JavaScript applications and a direct fetch
+  may return only the app shell. Try the canonical `/api/docs/` and `/en/docs/`
+  variants, navigate from the product API overview, and cross-check the official
+  example request, API Explorer, discovery actions, and current SDK/provider types.
+  Do not fill missing enums or constraints from memory.

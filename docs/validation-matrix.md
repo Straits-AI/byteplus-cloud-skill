@@ -17,7 +17,7 @@ coverage.
 
 ## Acceptance baseline
 
-- Date: 13–14 July 2026
+- Date: 13–16 July 2026
 - CLI: official BytePlus `bp` 1.0.17
 - Region: `ap-southeast-1`
 - Authentication: local OAuth-derived BytePlus profile
@@ -41,7 +41,8 @@ privately. This public document records capability-level outcomes only.
 | Seedream | Live E2E | One image, in-memory decode, metadata/digest verification, no retained artifact | Broader image workflows remain guidance |
 | Seedance 1.5 | Live E2E | One shortest bounded silent video, polling, media verification, task deletion, model deactivation | Seedance 2.0 prepaid path was intentionally excluded |
 | Seed Speech TTS 2.0 | Live E2E | One short TTS request, terminal code, decoded MP3 metadata/digest, service restored inactive | Additional voices, streaming clients, and deployed credential rotation remain guidance |
-| AgentKit | Live partial | OAuth-signed tool/runtime lists and documented create probes | Account redirected to a human entitlement gate; no runtime, agent, or AIO tool was created |
+| AgentKit AIO Sandbox | Live E2E | OAuth-reused `CodeEnv` tool at 2 vCPU/4 GiB, 60-second session, exact shell marker, session/tool deletion, fresh zero inventories | Custom managed runtime, release, model-backed agent, and runtime artifact path remain unvalidated |
+| AgentKit A2A runtime application | Live partial | Deterministic app passed local health/card/A2A calls; official build pushed a run-owned CR image; two managed creates were accepted but ended at `Error`, version 0, without endpoint/key; exact runtime/repository/namespace/registry cleanup and zero inventories were verified | Managed readiness, release, remote invoke, and runtime logs remain unvalidated |
 | Edge Functions | Guidance | Current `nest` CLI/MCP workflow and safety rules | No live `nest` deployment in this acceptance run |
 | Cloud Control Terraform | Guidance | Provider/source routing and plan/apply safety model | No full live Terraform stack acceptance |
 | TOS | Guidance | Product/API routing and secret/data boundaries | Not present in the verified generic CLI/Cloud Control baseline; no live bucket test |
@@ -61,9 +62,9 @@ The project may be released publicly when:
 
 ## Stable 1.0 direction
 
-A stable 1.0 should add repeatable, sanitized acceptance for AgentKit creation,
-public HTTP/APIG, Edge Functions, persistent Terraform infrastructure, and the
-major guidance-only service branches that the project chooses to support. It
+A stable 1.0 should add repeatable, sanitized acceptance for a custom AgentKit
+runtime, public HTTP/APIG, Edge Functions, persistent Terraform infrastructure,
+and the major guidance-only service branches that the project chooses to support. It
 should also repeat core tests in more than one BytePlus account and credential
 model, with a protected maintainer workflow for recurring live validation.
 

@@ -217,6 +217,22 @@ python3 <skill-dir>/scripts/bp_catalog.py find endpoint --service ark
 
 This wrapper invokes only `--help` and `version`. It cannot infer required fields, enum values, IAM permissions, side effects, regional availability, or pricing that the CLI omits.
 
+Resolve omitted values in this order:
+
+1. official product discovery actions for regions, Availability Zones,
+   specifications, versions, stock, and quotas;
+2. the exact official action page and its example request;
+3. current official SDK request types/constants or an installed provider schema;
+4. API Explorer for interactive confirmation.
+
+Do not claim that an SDK type supplies enums when it only declares `string`. Some
+BytePlus documentation routes are JavaScript applications and automated retrieval
+can return only the app shell even when search indexed the parameter table. Try the
+canonical `/api/docs/` and `/en/docs/` forms, follow the action from the product API
+overview, and use the official example request as the minimum known-good shape.
+Record the canonical URL and retrieval date; never infer values from a console
+screenshot or a similarly named Volcano Engine API.
+
 Use the spelling and API version shown by the installed CLI. Similar product generations may appear as separate service names. Never substitute a name remembered from Volcano Engine or an older BytePlus release.
 
 The CLI catalog is broad but not universal. A missing service may require a product SDK, S3-compatible tool, Terraform resource, or documented product API. For example, the v1.0.17 catalog does not expose a `tos` service; always recheck the installed version.
@@ -238,7 +254,28 @@ Important distinctions:
 - Do not mix `--body` with flattened API parameters.
 - Do not override an endpoint unless the current official documentation requires it.
 
-Prefer a structured JSON body for nested, non-secret inputs. Validate JSON locally and inspect the exact action help before sending it. Do not interpolate untrusted project text into a shell command; pass arguments as an array when invoking from code.
+Always use one structured JSON body for object or array inputs. Dotted flattened
+flags such as `--A.B` may appear in generated help but are not a reliable transport
+for nested values. Validate JSON locally, start from the official example, and
+inspect the exact action help before sending it. Do not mix `--body` and flattened
+parameters.
+
+This rule applies only to non-secret input. If the request contains a password,
+private key, token, or other secret and `bp` exposes no protected stdin/file
+mechanism, use an official SDK in a credential-isolating process and emit only a
+sanitized result. A JSON body passed as a CLI argument can still appear in process
+inspection or shell history.
+
+Do not assume List/Describe actions have optional pagination. Read the official
+parameter table and supply the documented first page and bounded page size; some
+services reject an otherwise empty list request. Likewise, call the service's
+region/AZ/specification discovery actions before create and preserve exact names
+such as `RegionId`, `ZoneId`, or `Zones` rather than normalizing them yourself.
+
+Treat documented character classes, lengths, and examples as part of the schema,
+especially for passwords and names. If the rule is missing, stop with the request
+ID and ask for authoritative clarification rather than sending successive secret
+variants to interpret opaque `400`/`500` responses.
 
 ## Debug safely
 

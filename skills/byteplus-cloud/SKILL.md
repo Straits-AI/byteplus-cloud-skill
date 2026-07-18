@@ -41,6 +41,10 @@ Resolve `<skill-dir>` to the directory containing this file.
 - Read [ecs-vpc.md](references/ecs-vpc.md) for VM, network, security-group,
   load-balancer, private-deployment, and bounded end-to-end ECS-over-SSH work.
 - Read [databases.md](references/databases.md) before provisioning or connecting to managed MySQL, PostgreSQL, or SQL Server.
+- Read [service-readiness.md](references/service-readiness.md) before the first
+  create for Kafka, KMS, or another activation/cross-service-role-dependent
+  managed service, and when a schema-correct create returns an opaque `400` or
+  `500`.
 - Read [vke.md](references/vke.md) for Kubernetes and Container Registry deployments.
 - Read [modelark.md](references/modelark.md) for endpoint lifecycle, Seed text,
   Seedream image, or Seedance video integration and bounded smoke tests.
@@ -251,7 +255,12 @@ For direct actions:
 6. Poll asynchronous operations with bounded retries.
 7. Read state again and compare it with the plan.
 
-For complex `bp` requests, use `--body` with one JSON object or array and do not mix it with flattened API parameters. Do not put secrets in the body or shell history. Remember that the fixed CLI flags use three hyphens: `---profile`, `---region`, and `---endpoint`.
+For object or array `bp` parameters, always use `--body` with one JSON object or
+array and do not mix it with flattened API parameters. Dotted nested flags such as
+`--ChargeInfo.ChargeType` are not a reliable encoding contract. Do not put secrets
+in the body or shell history; use a credential-isolating SDK path when the CLI
+cannot accept protected input. Remember that the fixed CLI flags use three
+hyphens: `---profile`, `---region`, and `---endpoint`.
 
 For Terraform:
 

@@ -185,10 +185,47 @@ class SkillStructureTests(unittest.TestCase):
         self.assertIn("account-owner decisions", agentkit)
         self.assertIn("Do not assume the AgentKit CLI natively", agentkit)
         self.assertIn("AgentKit managed tools and veFaaS Cloud Sandbox are distinct", agentkit)
+        self.assertIn("agentkit-sdk-python==0.7.13", agentkit)
+        self.assertIn("a2a-sdk==0.3.7", agentkit)
+        self.assertIn("/.well-known/agent-card.json", agentkit)
+        self.assertIn("`message/send`", agentkit)
+        self.assertIn("generated API key in plaintext", agentkit)
+        self.assertIn("Do not equate Container Registry", agentkit)
+        self.assertIn("blind retry can fail with a duplicate", agentkit)
+        self.assertIn("`Error` at version 0", agentkit)
+        self.assertIn("minimum replica of 1", agentkit)
         self.assertIn("Report `CLEAN` only", agentkit)
         self.assertIn(9, by_id)
         self.assertIn("ListRuntimes", by_id[9]["prompt"])
         self.assertIn("credential-isolating", " ".join(by_id[9]["expectations"]))
+
+    def test_managed_service_readiness_covers_issue_three_failures(self) -> None:
+        readiness = (SKILL / "references" / "service-readiness.md").read_text(
+            encoding="utf-8"
+        )
+        cli = (SKILL / "references" / "cli.md").read_text(encoding="utf-8")
+        security = (SKILL / "references" / "security.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("An `InternalError` is a symptom, not a diagnosis", readiness)
+        self.assertIn("ServiceRoleForKafka", readiness)
+        self.assertIn("CreateServiceLinkedRole", readiness)
+        self.assertIn("KMS_ServiceNotOpen", readiness)
+        self.assertIn("`DescribeInstances` is paginated", readiness)
+        self.assertIn("`CreateInstance` takes `ZoneId`", readiness)
+        self.assertIn("Do not use dotted flattened flags", readiness)
+        self.assertIn("DeletePublicAddress", readiness)
+        self.assertIn("release only the run-owned EIP", readiness)
+        self.assertIn("JavaScript applications", cli)
+        self.assertIn("protected stdin/file", cli)
+        self.assertIn("Do not\ngrant `IAMFullAccess`", security)
+
+        value = json.loads((SKILL / "evals" / "evals.json").read_text(encoding="utf-8"))
+        by_id = {item["id"]: item for item in value["evals"]}
+        self.assertIn(22, by_id)
+        self.assertIn("InternalError 500", by_id[22]["prompt"])
+        self.assertIn("ServiceRoleForKafka", " ".join(by_id[22]["expectations"]))
 
     def test_seed_speech_has_a_separate_activation_and_secret_boundary(self) -> None:
         speech = (SKILL / "references" / "seed-speech.md").read_text(encoding="utf-8")
@@ -231,6 +268,7 @@ class SkillStructureTests(unittest.TestCase):
             "references/seed-speech.md",
             "references/agentkit.md",
             "references/databases.md",
+            "references/service-readiness.md",
             "references/services.md",
             "references/operations.md",
             "references/security.md",

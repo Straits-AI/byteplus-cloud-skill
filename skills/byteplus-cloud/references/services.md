@@ -83,3 +83,9 @@ For every desired operation:
 6. If no official path exists, state the gap and stop before mutation.
 
 Never equate broad coverage with universal coverage. Never use an undocumented console endpoint or a Volcano Engine implementation as a BytePlus substitute.
+
+Before the first create for Kafka, KMS, or another managed product with activation
+or cross-service dependencies, read [service-readiness.md](service-readiness.md).
+Treat product activation, service-linked roles, region/AZ/spec stock, and
+dependency-aware teardown as part of the service contract rather than as errors to
+discover through repeated billable create calls.

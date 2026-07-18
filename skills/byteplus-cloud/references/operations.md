@@ -112,8 +112,12 @@ Reconcile it against live state at the start of future deployments.
 4. Capture sanitized error code and request ID.
 5. Inspect resource state and dependent-resource state.
 6. Check IAM denial, quota, availability, eventual consistency, network path, and service status.
-7. Change one variable at a time.
-8. Re-run verification after the fix.
+7. For a first managed-service create, check product activation and the exact
+   documented service-linked role before changing request values. An opaque
+   `InternalError` is not proof of either cause; follow
+   [service-readiness.md](service-readiness.md).
+8. Change one non-secret variable at a time only after prerequisites are proven.
+9. Re-run verification after the fix.
 
 Do not enable broad permissions merely to test. Do not retry a create call until checking whether it succeeded remotely.
 
@@ -130,3 +134,10 @@ Do not enable broad permissions merely to test. Do not retry a create call until
 List every resource and dependency to be removed. Confirm resource-specific data retention, snapshots, backups, public endpoints, and ongoing billing. Require explicit authorization for destructive cleanup even when the original deployment failed.
 
 After cleanup, verify absence through fresh List/Describe/Get calls and update non-secret manifests/state ownership records.
+
+Delete in reverse dependency order. Enumerate attached children, public endpoints,
+network interfaces/addresses, and parent resources from live state instead of
+guessing a universal sequence. For Kafka specifically, remove approved
+topics/groups and other blocking children, close public access, delete the
+pay-as-you-go instance, then release only the now-detached run-owned EIP; poll
+between asynchronous steps. See [service-readiness.md](service-readiness.md).

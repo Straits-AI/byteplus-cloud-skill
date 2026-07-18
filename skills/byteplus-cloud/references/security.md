@@ -75,6 +75,12 @@ credential-isolating client must capture it in memory, connect without printing 
 persisting it, emit only sanitized status/evidence, close promptly, and discard it.
 Never put the ticketed WSS endpoint in a run ledger or deployment report.
 
+Apply the same rule to AgentKit tool authorizers and session endpoints. Current
+CLI JSON output may include the generated API key directly, and session endpoints
+may carry authorization in their query strings even when a field filter was
+requested. Do not print raw `tools show`, `session show`, or `session list` output;
+capture and redact it before emitting safe fields.
+
 Redact fields whose names contain terms such as `access_key`, `secret`, `session_token`, `token`, `password`, `passphrase`, `credential`, `authorization`, `cookie`, `private_key`, `api_key`, `signature`, or `signed_url`. Redact complete authorization/cookie headers and complete PEM private-key blocks, not only the first whitespace-delimited value.
 
 ## Keep least privilege
@@ -85,6 +91,15 @@ Redact fields whose names contain terms such as `access_key`, `secret`, `session
 - Do not add broad wildcards to diagnose a denial.
 - Review IAM trust and pass-role effects, not only attached policy text.
 - Retest after reducing permissions.
+
+A service-linked role is still an IAM mutation. Read the exact documented role,
+service principal, managed policy, and trust relationship before creation; require
+approval for that specific role. Prefer the current `CreateServiceLinkedRole` API
+when the product's service name is documented and live help confirms it. Do not
+grant `IAMFullAccess`, create a generic broad role, or guess
+`ServiceRoleFor<Service>` merely to make an opaque create error disappear. Preserve
+shared service-linked roles during workload cleanup unless their revocation was
+separately approved and dependency-checked.
 
 ## Default to private and recoverable
 
